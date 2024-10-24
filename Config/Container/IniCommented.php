@@ -52,23 +52,17 @@ class Config_Container_IniCommented {
     * @access public
     * @param string $datasrc    path to the configuration file
     * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+    * @return bool returns true if ok
     */
     function parseDatasrc($datasrc, $obj)
     {
         $return = true;
         if (!file_exists($datasrc)) {
-            return PEAR::raiseError(
-                'Datasource file does not exist.',
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception('Datasource file does not exist.');
         }
         $lines = file($datasrc);
         if ($lines === false) {
-            return PEAR::raiseError(
-                'File could not be read',
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception('File could not be read');
         }
 
         $n = 0;
@@ -86,9 +80,6 @@ class Config_Container_IniCommented {
                 // a directive
                 
                 $values = $this->_quoteAndCommaParser($match[2]);
-                if (PEAR::isError($values)) {
-                    return PEAR::raiseError($values);
-                }
                 
                 if (count($values)) {
                     foreach($values as $value) {
@@ -104,7 +95,7 @@ class Config_Container_IniCommented {
                 // a section
                 $currentSection =& $obj->container->createSection($match[1]);
             } else {
-                return PEAR::raiseError("Syntax error in '$datasrc' at line $n.", null, PEAR_ERROR_RETURN);
+                throw new Exception("Syntax error in '$datasrc' at line $n.");
             }
         }
         return $return;
@@ -174,11 +165,7 @@ class Config_Container_IniCommented {
                             if ($state == 'normal' &&
                                 isset($return[$returnpos]) &&
                                 !empty($return[$returnpos][1])) {
-                                return PEAR::raiseError(
-                                    'invalid ini syntax, quotes cannot follow'
-                                    . " text '$text'",
-                                    null, PEAR_ERROR_RETURN
-                                );
+                                throw new Exception("invalid ini syntax, quotes cannot follow text '$text'");
                             }
                             if ($returnpos >= 0 && isset($return[$returnpos])) {
                                 // trim any unnecessary whitespace in earlier entries
@@ -217,10 +204,7 @@ class Config_Container_IniCommented {
                             }
                         break;
                         default :
-                            PEAR::raiseError(
-                                "::_quoteAndCommaParser oops, state missing",
-                                null, PEAR_ERROR_DIE
-                            );
+                            throw new Exception("::_quoteAndCommaParser oops, state missing");
                         break;
                     }
                 } else {
@@ -246,11 +230,7 @@ class Config_Container_IniCommented {
                         }
                     } else {
                         if (trim($char) != '') {
-                            return PEAR::raiseError(
-                                'invalid ini syntax, text after a quote'
-                                . " not allowed '$text'",
-                                null, PEAR_ERROR_RETURN
-                            );
+                            throw new Exception("invalid ini syntax, text after a quote not allowed '$text'");
                         }
                     }
                 }

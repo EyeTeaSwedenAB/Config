@@ -52,13 +52,13 @@ class Config_Container_Apache {
     * @access public
     * @param string $datasrc    path to the configuration file
     * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+    * @return bool returns true if ok
     */
     function parseDatasrc($datasrc, $obj)
     {
         $return = true;
         if (!is_readable($datasrc)) {
-            return PEAR::raiseError("Datasource file cannot be read.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Datasource file cannot be read.");
         }
         $lines = file($datasrc);
         $n = 0;
@@ -99,11 +99,11 @@ class Config_Container_Apache {
                 // a section closing
                 $currentSection =& $sections[count($sections)-1];
                 if ($currentSection->name != $match[1]) {
-                    return PEAR::raiseError("Section not closed in '$datasrc' at line $n.", null, PEAR_ERROR_RETURN);
+                    throw new Exception("Section not closed in '$datasrc' at line $n.");
                 }
                 array_pop($sections);
             } else {
-                return PEAR::raiseError("Syntax error in '$datasrc' at line $n.", null, PEAR_ERROR_RETURN);
+                throw new Exception("Syntax error in '$datasrc' at line $n.");
             }
         }
         return $return;

@@ -94,7 +94,7 @@ class Config_Container_XML extends XML_Parser
     * @access public
     * @param string $datasrc    path to the configuration file
     * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+    * @return bool true if ok
     */
     function &parseDatasrc($datasrc, &$obj)
     {
@@ -106,9 +106,6 @@ class Config_Container_XML extends XML_Parser
         if (is_string($datasrc)) {
             if ($this->options['isFile']) {
                 $err = $this->setInputFile($datasrc);
-                if (PEAR::isError($err)) {
-                    return $err;
-                }
                 $err = $this->parse();
             } else {
                 $err = $this->parseString($datasrc, true);

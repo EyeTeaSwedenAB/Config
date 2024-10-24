@@ -52,7 +52,7 @@ class Config_Container_PHPConstants extends Config_Container
      * @param string $datasrc Path to the configuration file
      * @param object &$obj    Reference to a config object
      *
-     * @return mixed PEAR_ERROR, if error occurs or true if ok
+     * @return bool true if ok
      *
      * @access public
      */
@@ -61,19 +61,13 @@ class Config_Container_PHPConstants extends Config_Container
         $return = true;
 
         if (!file_exists($datasrc)) {
-            return PEAR::raiseError(
-                'Datasource file does not exist.',
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception('Datasource file does not exist.');
         }
         
         $fileContent = file_get_contents($datasrc, true);
         
         if (!$fileContent) {
-            return PEAR::raiseError(
-                "File '$datasrc' could not be read.",
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception("File '$datasrc' could not be read.");
         }
         
         $rows = explode("\n", $fileContent);
@@ -181,7 +175,7 @@ class Config_Container_PHPConstants extends Config_Container
      * @param mixed  $datasrc Info on datasource such as path to the file
      * @param string &$obj    Configuration object to write
      *
-     * @return mixed PEAR_Error on failure or boolean true if all went well
+     * @return bool true if all went well
      *
      * @access public
      */
@@ -189,10 +183,7 @@ class Config_Container_PHPConstants extends Config_Container
     {
         $fp = @fopen($datasrc, 'w');
         if (!$fp) {
-            return PEAR::raiseError(
-                'Cannot open datasource for writing.',
-                1, PEAR_ERROR_RETURN
-            );
+            throw new Exception('Cannot open datasource for writing.');
         }
 
         $string  = "<?php";

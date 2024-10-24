@@ -17,7 +17,6 @@
 //
 // $Id$
 
-require_once('PEAR.php');
 require_once('Config/Container.php');
 
 $GLOBALS['CONFIG_TYPES'] =
@@ -106,7 +105,7 @@ class Config {
      * @access   public
      * @static
      * @author   Greg Beaver <cellog@users.sourceforge.net>
-     * @return   true|PEAR_Error  true on success
+     * @return   bool  true on success
      */
     function registerConfigType($configType, $configInfo = false)
     {
@@ -116,7 +115,7 @@ class Config {
                 $info[1] == $configInfo[1]) {
                 return true;
             } else {
-                return PEAR::raiseError("Config::registerConfigType registration of existing $configType failed.", null, PEAR_ERROR_RETURN);
+                throw new Exception("Config::registerConfigType registration of existing $configType failed.");
             }
         }
         if (!is_array($configInfo)) {
@@ -127,10 +126,10 @@ class Config {
         $file_exists = @include_once($configInfo[0]);
         if ($file_exists) {
             if (!class_exists($configInfo[1])) {
-                return PEAR::raiseError("Config::registerConfigType class '$configInfo[1]' not found in $configInfo[0]", null, PEAR_ERROR_RETURN);
+                throw new Exception("Config::registerConfigType class '$configInfo[1]' not found in $configInfo[0]");
             }
         } else {
-            return PEAR::raiseError("Config::registerConfigType file $configInfo[0] not found", null, PEAR_ERROR_RETURN);
+            throw new Exception("Config::registerConfigType file $configInfo[0] not found");
         }
         $GLOBALS['CONFIG_TYPES'][strtolower($configType)] = $configInfo;
         return true;
@@ -155,7 +154,7 @@ class Config {
     *
     * @param object  $rootContainer  container to be used as the first child to root
     * @access public
-    * @return   mixed    true on success or PEAR_Error
+    * @return   bool    true on success
     */
     function setRoot(&$rootContainer)
     {
@@ -168,7 +167,7 @@ class Config {
             }
             return true;
         } else {
-            return PEAR::raiseError("Config::setRoot only accepts object of Config_Container type.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Config::setRoot only accepts object of Config_Container type.");
         }
     } // end func setRoot
 
@@ -182,13 +181,13 @@ class Config {
     * @param string  $configType  Type of configuration
     * @param array   $options     Options for the parser
     * @access public
-    * @return mixed PEAR_Error on error or Config_Container object
+    * @return Config_Container Config_Container object
     */
     function &parseConfig($datasrc, $configType, $options = array())
     {
         $configType = strtolower($configType);
         if (!$this->isConfigTypeRegistered($configType)) {
-            return PEAR::raiseError("Configuration type '$configType' is not registered in Config::parseConfig.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Configuration type '$configType' is not registered in Config::parseConfig.");
         }
         $includeFile = $GLOBALS['CONFIG_TYPES'][$configType][0];
         $className = $GLOBALS['CONFIG_TYPES'][$configType][1];
@@ -212,7 +211,7 @@ class Config {
     * @param string  $configType  Type of configuration
     * @param array   $options     Options for config container
     * @access public
-    * @return mixed PEAR_Error on error or true if ok
+    * @return bool true if ok
     */
     function writeConfig($datasrc = null, $configType = null, $options = array())
     {

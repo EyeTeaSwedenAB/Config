@@ -53,7 +53,7 @@ class Config_Container_IniFile
      * @param string $datasrc path to the configuration file
      * @param object &$obj    reference to a config object
      *
-     * @return mixed Returns a PEAR_ERROR, if error occurs or true if ok
+     * @return bool true if ok
      *
      * @access public
      */
@@ -61,18 +61,12 @@ class Config_Container_IniFile
     {
         $return = true;
         if (!file_exists($datasrc)) {
-            return PEAR::raiseError(
-                "Datasource file does not exist.",
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception("Datasource file does not exist.");
         }
         $currentSection = $obj->container;
         $confArray = parse_ini_file($datasrc, true);
         if (!$confArray) {
-            return PEAR::raiseError(
-                "File '$datasrc' does not contain configuration data.",
-                null, PEAR_ERROR_RETURN
-            );
+            throw new Exception("File '$datasrc' does not contain configuration data.");
         }
         foreach ($confArray as $key => $value) {
             if (is_array($value)) {

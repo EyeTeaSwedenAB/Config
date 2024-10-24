@@ -68,23 +68,23 @@ class Config_Container_PHPArray {
     * @access public
     * @param string $datasrc    path to the configuration file
     * @param object $obj        reference to a config object
-    * @return mixed    returns a PEAR_ERROR, if error occurs or true if ok
+    * @return bool    returns true if ok
     */
     function parseDatasrc($datasrc, $obj)
     {
         $return = true;
         if (empty($datasrc)) {
-            return PEAR::raiseError("Datasource file path is empty.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Datasource file path is empty.");
         }
         if (is_array($datasrc)) {
             $this->_parseArray($datasrc, $obj->container);
         } else {
             if (!file_exists($datasrc)) {
-                return PEAR::raiseError("Datasource file does not exist.", null, PEAR_ERROR_RETURN);
+                throw new Exception("Datasource file does not exist.");
             } else {
                 include($datasrc);
                 if (!isset(${$this->options['name']}) || !is_array(${$this->options['name']})) {
-                    return PEAR::raiseError("File '$datasrc' does not contain a required '".$this->options['name']."' array.", null, PEAR_ERROR_RETURN);
+                    throw new Exception("File '$datasrc' does not contain a required '".$this->options['name']."' array.");
                 }
             }
             $this->_parseArray(${$this->options['name']}, $obj->container);
@@ -251,7 +251,7 @@ class Config_Container_PHPArray {
             @fclose($fp);
             return true;
         } else {
-            return PEAR::raiseError('Cannot open datasource for writing.', 1, PEAR_ERROR_RETURN);
+            throw new Exception('Cannot open datasource for writing.');
         }
     } // end func writeDatasrc
 } // end class Config_Container_PHPArray

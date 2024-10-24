@@ -118,18 +118,18 @@ class Config_Container {
     * @param  object   $item      a container object
     * @param  string   $where     choose a position 'bottom', 'top', 'after', 'before'
     * @param  object   $target    needed if you choose 'before' or 'after' in $where
-    * @return mixed    reference to added container on success, Pear_Error on error
+    * @return mixed    reference to added container on success
     */
     function &addItem(&$item, $where = 'bottom', $target = null)
     {
         if ($this->type != 'section') {
-            return PEAR::raiseError('Config_Container::addItem must be called on a section type object.', null, PEAR_ERROR_RETURN);
+            throw new Exception('Config_Container::addItem must be called on a section type object.');
         }
         if (is_null($target)) {
             $target =& $this;
         }
         if (strtolower(get_class($target)) != 'config_container') {
-            return PEAR::raiseError('Target must be a Config_Container object in Config_Container::addItem.', null, PEAR_ERROR_RETURN);
+            throw new Exception('Target must be a Config_Container object in Config_Container::addItem.');
         }
 
         switch ($where) {
@@ -146,7 +146,7 @@ class Config_Container {
                 $index = -1;
                 break;
             default:
-                return PEAR::raiseError('Use only top, bottom, before or after in Config_Container::addItem.', null, PEAR_ERROR_RETURN);
+                throw new Exception('Use only top, bottom, before or after in Config_Container::addItem.');
         }
         if (isset($index) && $index >= 0) {
             array_splice($this->children, $index, 0, 'tmp');
@@ -166,7 +166,7 @@ class Config_Container {
     * @param  string    $content        Object content
     * @param  string    $where          Position : 'top', 'bottom', 'before', 'after'
     * @param  object    $target         Needed when $where is 'before' or 'after'
-    * @return object  reference to new item or Pear_Error
+    * @return object  reference to new item
     */
     function &createComment($content = '', $where = 'bottom', $target = null)
     {
@@ -242,7 +242,7 @@ class Config_Container {
     function &getItem($type = null, $name = null, $content = null, $attributes = null, $index = -1)
     {
         if ($this->type != 'section') {
-            return PEAR::raiseError('Config_Container::getItem must be called on a section type object.', null, PEAR_ERROR_RETURN);
+            throw new Exception('Config_Container::getItem must be called on a section type object.');
         }
         if (!is_null($type)) {
             $testFields[] = 'type';
@@ -323,7 +323,7 @@ class Config_Container {
     function &searchPath($args)
     {
         if ($this->type != 'section') {
-            return PEAR::raiseError('Config_Container::searchPath must be called on a section type object.', null, PEAR_ERROR_RETURN);
+            throw new Exception('Config_Container::searchPath must be called on a section type object.');
         }
 
         $arg = array_shift($args);
@@ -437,12 +437,12 @@ class Config_Container {
     /**
     * Deletes an item (section, directive, comment...) from the current object
     * TODO: recursive remove in sub-sections
-    * @return mixed  true if object was removed, false if not, or PEAR_Error if root
+    * @return bool  true if object was removed, false if not
     */
     function removeItem()
     {
         if ($this->isRoot()) {
-            return PEAR::raiseError('Cannot remove root item in Config_Container::removeItem.', null, PEAR_ERROR_RETURN);
+            throw new Exception('Cannot remove root item in Config_Container::removeItem.');
         }
         $index = $this->getItemIndex();
         if (!is_null($index)) {
@@ -637,7 +637,7 @@ class Config_Container {
     function &setDirective($name, $content, $index = -1)
     {
         $item =& $this->getItem('directive', $name, null, null, $index);
-        if ($item === false || PEAR::isError($item)) {
+        if ($item === false) {
             // Directive does not exist, will create one
             unset($item);
             return $this->createDirective($name, $content, null);
@@ -664,13 +664,13 @@ class Config_Container {
     * Call the toString methods in the container plugin
     * @param    string  $configType  Type of configuration used to generate the string
     * @param    array   $options     Specify special options used by the parser
-    * @return   mixed   true on success or PEAR_ERROR
+    * @return   bool   true on success
     */
     function toString($configType, $options = array())
     {
         $configType = strtolower($configType);
         if (!isset($GLOBALS['CONFIG_TYPES'][$configType])) {
-            return PEAR::raiseError("Configuration type '$configType' is not registered in Config_Container::toString.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Configuration type '$configType' is not registered in Config_Container::toString.");
         }
         $includeFile = $GLOBALS['CONFIG_TYPES'][$configType][0];
         $className   = $GLOBALS['CONFIG_TYPES'][$configType][1];
@@ -740,13 +740,13 @@ class Config_Container {
     * @param  string $configType     Type of configuration
     * @param  array  $options        Options for writer
     * @access public
-    * @return mixed     true on success or PEAR_ERROR
+    * @return bool     true on success
     */
     function writeDatasrc($datasrc, $configType, $options = array())
     {
         $configType = strtolower($configType);
         if (!isset($GLOBALS['CONFIG_TYPES'][$configType])) {
-            return PEAR::raiseError("Configuration type '$configType' is not registered in Config_Container::writeDatasrc.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Configuration type '$configType' is not registered in Config_Container::writeDatasrc.");
         }
         $includeFile = $GLOBALS['CONFIG_TYPES'][$configType][0];
         $className = $GLOBALS['CONFIG_TYPES'][$configType][1];
@@ -769,7 +769,7 @@ class Config_Container {
             @fclose($fp);
             return true;
         } else {
-            return PEAR::raiseError('Cannot open datasource for writing.', 1, PEAR_ERROR_RETURN);
+            throw new Exception('Cannot open datasource for writing.');
         }
     } // end func writeDatasrc
 } // end class Config_Container

@@ -62,13 +62,13 @@ class Config_Container_GenericConf {
     * @access public
     * @param string $datasrc    path to the configuration file
     * @param object $obj        reference to a config object
-    * @return mixed returns a PEAR_ERROR, if error occurs or true if ok
+    * @return bool returns true if ok
     */
     function parseDatasrc($datasrc, $obj)
     {
         $return = true;
         if (!is_readable($datasrc)) {
-            return PEAR::raiseError("Datasource file cannot be read.", null, PEAR_ERROR_RETURN);
+            throw new Exception("Datasource file cannot be read.");
         }
 
         $lines = file($datasrc);
@@ -97,7 +97,7 @@ class Config_Container_GenericConf {
                 // a directive
                 $currentSection->createDirective($match[1], $match[2]);
             } else {
-                return PEAR::raiseError("Syntax error in '$datasrc' at line $n.", null, PEAR_ERROR_RETURN);
+                throw new Exception("Syntax error in '$datasrc' at line $n.");
             }
         }
         return $return;
