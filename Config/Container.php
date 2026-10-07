@@ -691,6 +691,9 @@ class Config_Container {
     */
     function toArray($useAttr = true)
     {
+        if ($this->type === 'blank') {
+            return null;
+        }
         $array[$this->name] = array();
         switch ($this->type) {
             case 'directive':
